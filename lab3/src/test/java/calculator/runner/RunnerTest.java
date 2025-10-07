@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
         features = "src/test/resources/features",
         glue = {
                 "calculator.stepdefs",
-                "calculator.hooks",
                 "calculator.config"
         },
         plugin = {

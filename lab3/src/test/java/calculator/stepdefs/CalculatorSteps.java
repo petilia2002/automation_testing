@@ -2,6 +2,7 @@
 package calculator.stepdefs;
 
 import calculator.dto.CalculationResponse;
+import calculator.dto.HistoryRequest;
 import io.cucumber.java.en.*;
 import io.cucumber.datatable.DataTable;
 import calculator.service.CalculatorService;
@@ -10,12 +11,14 @@ import calculator.entity.NumberSystem;
 import calculator.entity.OperationType;
 import calculator.dto.CalculationRequest;
 import calculator.model.CalculationData;
+import calculator.model.HistoryFilter;
 import calculator.repository.CalculationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import io.cucumber.java.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,14 +32,40 @@ public class CalculatorSteps {
     private List<CalculationData> inputData = new ArrayList<>();
 
     private String result;
-    private List<Calculation> history;
-    private String[] savedNumbers; // Для хранения чисел с кастомным разделителем
+    private List<Calculation> historyResults = new ArrayList<>();
+    private Map<HistoryFilter, List<Calculation>> historyByFilter = new LinkedHashMap<>();
+
+    private final DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
     @Autowired
     public CalculatorSteps(CalculatorService calculatorService,
                            CalculationRepository calculationRepository) {
         this.calculatorService = calculatorService;
         this.calculationRepository = calculationRepository;
+    }
+
+    // ---------------- hooks ----------------
+    @Before
+    public void beforeScenario() {
+        calculationRepository.deleteAll();
+        createdResponses.clear();
+        inputData.clear();
+        historyResults.clear();
+        historyByFilter.clear();
+    }
+
+    @After
+    public void afterScenario() {
+        calculationRepository.deleteAll();
+    }
+
+    // ---------------- утилиты ----------------
+    private List<String> normalizeSingleColumn(DataTable dt) {
+        List<String> list = dt.asList(String.class);
+        if (!list.isEmpty() && list.get(0).equalsIgnoreCase("operationType")) {
+            return list.subList(1, list.size());
+        }
+        return list;
     }
 
     @Given("база данных очищена")
@@ -244,5 +273,157 @@ public class CalculatorSteps {
         }
 
         System.out.println("✅ Все результаты соответствуют ожиданиям!");
+    }
+
+    // ---------------- DataTableType для HistoryFilter (преобразование строки в объект) ----------------
+    @DataTableType
+    public HistoryFilter historyFilterEntry(Map<String, String> entry) {
+        HistoryFilter f = new HistoryFilter();
+
+        if (entry.containsKey("operationType") && entry.get("operationType") != null && !entry.get("operationType").isEmpty()) {
+            f.setOperationType(OperationType.valueOf(entry.get("operationType")));
+        }
+        if (entry.containsKey("firstNumberSystem") && entry.get("firstNumberSystem") != null && !entry.get("firstNumberSystem").isEmpty()) {
+            f.setFirstNumberSystem(NumberSystem.valueOf(entry.get("firstNumberSystem")));
+        }
+        if (entry.containsKey("secondNumberSystem") && entry.get("secondNumberSystem") != null && !entry.get("secondNumberSystem").isEmpty()) {
+            f.setSecondNumberSystem(NumberSystem.valueOf(entry.get("secondNumberSystem")));
+        }
+        if (entry.containsKey("startDate") && entry.get("startDate") != null && !entry.get("startDate").isEmpty()) {
+            f.setStartDate(LocalDateTime.parse(entry.get("startDate"), dtf));
+        }
+        if (entry.containsKey("endDate") && entry.get("endDate") != null && !entry.get("endDate").isEmpty()) {
+            f.setEndDate(LocalDateTime.parse(entry.get("endDate"), dtf));
+        }
+        if (entry.containsKey("expectedCount") && entry.get("expectedCount") != null && !entry.get("expectedCount").isEmpty()) {
+            f.setExpectedCount(Integer.valueOf(entry.get("expectedCount")));
+        }
+        return f;
+    }
+
+    // ---------------- Сценарии истории ----------------
+
+    @Given("в базе есть расчеты:")
+    public void givenCalculationsExist(DataTable dataTable) {
+        calculationRepository.deleteAll();
+        List<Map<String, String>> rows = dataTable.asMaps(String.class, String.class);
+
+        for (Map<String, String> row : rows) {
+            Calculation calculation = new Calculation(
+                    row.get("firstNumber"),
+                    NumberSystem.valueOf(row.get("firstNumberSystem")),
+                    row.get("secondNumber"),
+                    NumberSystem.valueOf(row.get("secondNumberSystem")),
+                    OperationType.valueOf(row.get("operationType")),
+                    row.get("result"),
+                    LocalDateTime.parse(row.get("createdAt"))
+            );
+            calculationRepository.save(calculation);
+        }
+        System.out.println("✅ В базу добавлено " + rows.size() + " расчетов");
+    }
+
+    // 1) вся история без фильтров
+    @When("я запрашиваю историю вычислений без фильтров")
+    public void getHistoryWithoutFilters() {
+        HistoryRequest req = new HistoryRequest();
+        historyResults = calculatorService.getCalculationHistory(req);
+    }
+
+    @Then("я получаю список из {int} операций")
+    public void verifyHistorySize(int expectedCount) {
+        assertNotNull(historyResults);
+        assertEquals(expectedCount, historyResults.size(),
+                "Ожидаемое количество операций не совпало");
+    }
+
+    // 2) передача коллекции через таблицу (operationType column)
+    @When("я запрашиваю историю по типам операций:")
+    public void getHistoryByOperationTypes(DataTable dt) {
+        List<String> ops = normalizeSingleColumn(dt);
+        // агрегируем результаты по всем запрошенным типам
+        historyResults = new ArrayList<>();
+        for (String opStr : ops) {
+            HistoryRequest req = new HistoryRequest();
+            req.setOperationType(OperationType.valueOf(opStr));
+            List<Calculation> res = calculatorService.getCalculationHistory(req);
+            historyResults.addAll(res);
+        }
+    }
+
+    @Then("все операции имеют тип из таблицы:")
+    public void allOperationsHaveTypeFromTable(DataTable dt) {
+        List<String> ops = normalizeSingleColumn(dt);
+        Set<OperationType> allowed = ops.stream().map(OperationType::valueOf).collect(Collectors.toSet());
+        assertFalse(historyResults.isEmpty(), "Ожидалось, что найдутся операции");
+        for (Calculation c : historyResults) {
+            assertTrue(((Set<?>) allowed).contains(c.getOperationType()),
+                    "Найденo недопустимое значение operationType: " + c.getOperationType());
+        }
+    }
+
+    // 3) передача через класс (каждая строка — фильтр с expectedCount)
+    @When("я запрашиваю историю по фильтрам \\(классом):")
+    public void getHistoryByFiltersClass(List<HistoryFilter> filters) {
+        historyByFilter.clear();
+        for (HistoryFilter f : filters) {
+            HistoryRequest req = new HistoryRequest();
+            req.setOperationType(f.getOperationType());
+            req.setFirstNumberSystem(f.getFirstNumberSystem());
+            req.setSecondNumberSystem(f.getSecondNumberSystem());
+            req.setStartDate(f.getStartDate());
+            req.setEndDate(f.getEndDate());
+
+            List<Calculation> res = calculatorService.getCalculationHistory(req);
+            historyByFilter.put(f, res);
+        }
+    }
+
+    @Then("результаты для каждого фильтра совпадают с ожидаемым")
+    public void verifyResultsForEachFilter() {
+        assertFalse(historyByFilter.isEmpty(), "Не было выполнено ни одного запроса по фильтрам");
+        for (Map.Entry<HistoryFilter, List<Calculation>> e : historyByFilter.entrySet()) {
+            HistoryFilter filter = e.getKey();
+            List<Calculation> actual = e.getValue();
+            Integer expected = filter.getExpectedCount();
+            assertNotNull(expected, "В таблице филтров не указан expectedCount для " + filter);
+            assertEquals(expected.intValue(), actual.size(),
+                    String.format("Для фильтра %s ожидали %d записей, получили %d",
+                            filter, expected, actual.size()));
+        }
+    }
+
+    // 4) кастомный делимитер (использует уже зарегистрированный @ParameterType semicolonSeparatedList)
+    @When("я запрашиваю историю с фильтром: {semicolonSeparatedList}")
+    public void getHistoryWithDelimitedFilter(List<String> parts) {
+        // ожидаем: [operationType, firstNumberSystem, secondNumberSystem]
+        if (parts.size() < 3) {
+            throw new IllegalArgumentException("Ожидался формат: OP;FIRST_SYS;SECOND_SYS");
+        }
+        HistoryRequest req = new HistoryRequest();
+        req.setOperationType(OperationType.valueOf(parts.get(0)));
+        req.setFirstNumberSystem(NumberSystem.valueOf(parts.get(1)));
+        req.setSecondNumberSystem(NumberSystem.valueOf(parts.get(2)));
+
+        historyResults = calculatorService.getCalculationHistory(req);
+    }
+
+    @Then("все операции имеют тип {word}")
+    public void allOperationsHaveType(String op) {
+        OperationType expected = OperationType.valueOf(op);
+        assertFalse(historyResults.isEmpty(), "Ожидалось ненулевое количество операций");
+        for (Calculation c : historyResults) {
+            assertEquals(expected, c.getOperationType(), "Найдено несоответствие типа операции");
+        }
+    }
+
+    // 5) несколько аргументов (операция + даты)
+    @When("я запрашиваю историю с типом {word} с {string} по {string}")
+    public void getHistoryByTypeAndPeriod(String operation, String start, String end) {
+        HistoryRequest req = new HistoryRequest();
+        req.setOperationType(OperationType.valueOf(operation));
+        req.setStartDate(LocalDateTime.parse(start, dtf));
+        req.setEndDate(LocalDateTime.parse(end, dtf));
+        historyResults = calculatorService.getCalculationHistory(req);
     }
 }
