@@ -1,0 +1,18 @@
+[
+  {
+    "firstNumber": "10",
+    "firstNumberSystem": "binary",
+    "secondNumber": "1",
+    "secondNumberSystem": "decimal",
+    "operationType": "add"
+  },
+  {
+    "firstNumber": "A",
+    "firstNumberSystem": "hexadecimal",
+    "secondNumber": "5",
+    "secondNumberSystem": "hexadecimal",
+    "operationType": "multiply"
+  }
+]
+
+
