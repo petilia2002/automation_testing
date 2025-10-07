@@ -16,7 +16,7 @@
 - **JUnit / TestNG** — фреймворки для написания тестов  
 - **Selenium / Selenide** — инструменты для тестирования UI  
 - **Allure / Surefire** — генерация отчётов  
-- **Docker Destop** - запуск интеграционных тестов (Test Containers)
+- **Docker Destop** — запуск интеграционных тестов (Test Containers)
 - **Git** — для контроля версий
 
 ---
