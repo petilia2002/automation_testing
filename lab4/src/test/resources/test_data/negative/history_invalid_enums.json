@@ -1,0 +1,7 @@
+{
+  "invalidOperationTypes": ["PLUS", "add"],
+  "invalidFirstSystems": ["BIN", "binary"],
+  "invalidSecondSystems": ["DEC", "decimal"]
+}
+
+
