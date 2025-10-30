@@ -1,0 +1,534 @@
+{
+	"info": {
+		"_postman_id": "0202a09b-0c80-4319-acae-1a3e69113a6c",
+		"name": "Testing - lab5",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28446206"
+	},
+	"item": [
+		{
+			"name": "ADD",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ содержит результат\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    pm.expect(json).to.have.property(\"result\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Неверный тип операции возвращает ошибку\", function () {\r",
+							"    pm.sendRequest({\r",
+							"        url: `${pm.environment.get(\"baseUrl\")}/calculate`,\r",
+							"        method: \"POST\",\r",
+							"        header: {\"Content-Type\": \"application/json\"},\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify({\r",
+							"                \"firstNumber\": \"1010\",\r",
+							"                \"firstNumberSystem\": \"BINARY\",\r",
+							"                \"secondNumber\": \"110\",\r",
+							"                \"secondNumberSystem\": \"BINARY\",\r",
+							"                \"operationType\": \"INVALID\"\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        pm.expect(res.code).to.not.equal(200);\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstNumber\": \"1010\",\r\n    \"firstNumberSystem\": \"BINARY\",\r\n    \"secondNumber\": \"110\",\r\n    \"secondNumberSystem\": \"BINARY\",\r\n    \"operationType\": \"ADD\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/calculate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SUBTRACT",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ содержит результат\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    pm.expect(json).to.have.property(\"result\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Неверный тип операции возвращает ошибку\", function () {\r",
+							"    pm.sendRequest({\r",
+							"        url: `${pm.environment.get(\"baseUrl\")}/calculate`,\r",
+							"        method: \"POST\",\r",
+							"        header: {\"Content-Type\": \"application/json\"},\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify({\r",
+							"                \"firstNumber\": \"17\",\r",
+							"                \"firstNumberSystem\": \"OCTAL\",\r",
+							"                \"secondNumber\": \"5\",\r",
+							"                \"secondNumberSystem\": \"OCTAL\",\r",
+							"                \"operationType\": \"INVALID\"\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        pm.expect(res.code).to.not.equal(200);\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstNumber\": \"17\",\r\n    \"firstNumberSystem\": \"OCTAL\",\r\n    \"secondNumber\": \"5\",\r\n    \"secondNumberSystem\": \"OCTAL\",\r\n    \"operationType\": \"SUBTRACT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/calculate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MULTIPLY",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ содержит результат\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    pm.expect(json).to.have.property(\"result\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Неверный тип операции возвращает ошибку\", function () {\r",
+							"    pm.sendRequest({\r",
+							"        url: `${pm.environment.get(\"baseUrl\")}/calculate`,\r",
+							"        method: \"POST\",\r",
+							"        header: {\"Content-Type\": \"application/json\"},\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify({\r",
+							"                \"firstNumber\": \"A\",\r",
+							"                \"firstNumberSystem\": \"HEXADECIMAL\",\r",
+							"                \"secondNumber\": \"5\",\r",
+							"                \"secondNumberSystem\": \"HEXADECIMAL\",\r",
+							"                \"operationType\": \"INVALID\"\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        pm.expect(res.code).to.not.equal(200);\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstNumber\": \"A\",\r\n    \"firstNumberSystem\": \"HEXADECIMAL\",\r\n    \"secondNumber\": \"5\",\r\n    \"secondNumberSystem\": \"HEXADECIMAL\",\r\n    \"operationType\": \"MULTIPLY\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/calculate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DIVIDE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ содержит результат\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    pm.expect(json).to.have.property(\"result\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Неверный тип операции возвращает ошибку\", function () {\r",
+							"    pm.sendRequest({\r",
+							"        url: `${pm.environment.get(\"baseUrl\")}/calculate`,\r",
+							"        method: \"POST\",\r",
+							"        header: {\"Content-Type\": \"application/json\"},\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify({\r",
+							"                \"firstNumber\": \"15\",\r",
+							"                \"firstNumberSystem\": \"DECIMAL\",\r",
+							"                \"secondNumber\": \"3\",\r",
+							"                \"secondNumberSystem\": \"DECIMAL\",\r",
+							"                \"operationType\": \"INVALID\"\r",
+							"            })\r",
+							"        }\r",
+							"    }, function (err, res) {\r",
+							"        pm.expect(res.code).to.not.equal(200);\r",
+							"    });\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstNumber\": \"15\",\r\n    \"firstNumberSystem\": \"DECIMAL\",\r\n    \"secondNumber\": \"3\",\r\n    \"secondNumberSystem\": \"DECIMAL\",\r\n    \"operationType\": \"DIVIDE\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/calculate",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "HISTORY",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Статус 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ответ содержит массив\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    pm.expect(json).to.be.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ошибка при некорректных датах\", function (done) {\r",
+							"    pm.sendRequest({\r",
+							"        url: `${pm.environment.get(\"baseUrl\")}/history?startDate=invalid&endDate=123`,\r",
+							"        method: \"GET\"\r",
+							"    }, function (err, res) {\r",
+							"        try {\r",
+							"            pm.expect(res).to.not.be.undefined;\r",
+							"            pm.expect(res.code).to.be.oneOf([400, 422]);\r",
+							"        } finally {\r",
+							"            done();\r",
+							"        }\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"console.log('RUN');\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/history?startDate=2025-10-28T18:09:00&endDate=2025-10-28T18:10:00",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"history"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2025-10-28T18:09:00"
+						},
+						{
+							"key": "endDate",
+							"value": "2025-10-28T18:10:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Parallel Load Test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// === Настройки ===\r",
+							"const TOTAL_REQUESTS = 1000;    // сколько всего HTTP-запросов отправить\r",
+							"const BATCH_SIZE = 100;         // сколько отправлять параллельно в одном батче\r",
+							"const baseUrl = pm.environment.get('baseUrl') || pm.collectionVariables.get('baseUrl') || 'http://localhost:8080/api/calculator';\r",
+							"\r",
+							"// Типы операций, которые сервер принимает в поле operationType\r",
+							"const opTypes = ['ADD', 'MULTIPLY', 'SUBTRACT', 'DIVIDE', 'HISTORY'];\r",
+							"\r",
+							"// === Вспомогательные функции ===\r",
+							"function nowIso() {\r",
+							"  return new Date().toISOString();\r",
+							"}\r",
+							"\r",
+							"function isoMinusSeconds(sec) {\r",
+							"  return new Date(Date.now() - sec * 1000).toISOString();\r",
+							"}\r",
+							"\r",
+							"// Создаём тело POST /calculate.\r",
+							"// Используем BINARY представленние (строки), как в примере — это повторяемо и валидно.\r",
+							"function makeCalculateBody(opType, i) {\r",
+							"  // Создаём два числа (зависимые от i, чтобы была воспроизводимость)\r",
+							"  const a =  (i % 255) + 1;      // 1..255\r",
+							"  const b = ((i * 7) % 127) + 1; // 1..127\r",
+							"  return {\r",
+							"    firstNumber: a.toString(2),\r",
+							"    firstNumberSystem: \"BINARY\",\r",
+							"    secondNumber: b.toString(2),\r",
+							"    secondNumberSystem: \"BINARY\",\r",
+							"    operationType: opType\r",
+							"  };\r",
+							"}\r",
+							"\r",
+							"function sendReqPromise(options) {\r",
+							"  return new Promise(resolve => {\r",
+							"    pm.sendRequest(options, (err, res) => {\r",
+							"      // Используем responseTime, если есть — это чистое время сети\r",
+							"      const duration = res && typeof res.responseTime === 'number'\r",
+							"        ? res.responseTime\r",
+							"        : null;\r",
+							"\r",
+							"      const status = err ? 'ERR' : (res && res.code ? String(res.code) : 'NO_CODE');\r",
+							"      const ok = (!err && res && res.code >= 200 && res.code < 300);\r",
+							"      resolve({\r",
+							"        err: err ? String(err) : null,\r",
+							"        status,\r",
+							"        ok,\r",
+							"        duration: duration || 0,\r",
+							"        url: options.url\r",
+							"      });\r",
+							"    });\r",
+							"  });\r",
+							"}\r",
+							"\r",
+							"// === Построим список запросов (TOTAL_REQUESTS) ===\r",
+							"const requests = [];\r",
+							"for (let i = 0; i < TOTAL_REQUESTS; i++) {\r",
+							"  const op = opTypes[i % opTypes.length]; // циклим по 5 типам\r",
+							"  if (op === 'HISTORY') {\r",
+							"    // GET history - берем последний 60 секунд (пример)\r",
+							"    const endDate = nowIso();\r",
+							"    const startDate = isoMinusSeconds(60);\r",
+							"    const url = `${baseUrl.replace(/\\/$/, '')}/history?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;\r",
+							"    requests.push({ url, method: 'GET' });\r",
+							"  } else {\r",
+							"    // POST /calculate с JSON телом\r",
+							"    const body = makeCalculateBody(op, i);\r",
+							"    requests.push({\r",
+							"      url: `${baseUrl.replace(/\\/$/, '')}/calculate`,\r",
+							"      method: 'POST',\r",
+							"      header: { 'Content-Type': 'application/json' },\r",
+							"      body: {\r",
+							"        mode: 'raw',\r",
+							"        raw: JSON.stringify(body)\r",
+							"      }\r",
+							"    });\r",
+							"  }\r",
+							"}\r",
+							"\r",
+							"// === Выполнение батчами (безопаснее) ===\r",
+							"(async () => {\r",
+							"  console.log(`Start parallel load: total=${TOTAL_REQUESTS}, batchSize=${BATCH_SIZE}, baseUrl=${baseUrl}`);\r",
+							"  const results = [];\r",
+							"  const startAll = Date.now();\r",
+							"\r",
+							"  for (let i = 0; i < requests.length; i += BATCH_SIZE) {\r",
+							"    const batch = requests.slice(i, i + BATCH_SIZE);\r",
+							"    const promises = batch.map(r => sendReqPromise(r));\r",
+							"    // ждём весь батч параллельно\r",
+							"    const batchResults = await Promise.all(promises);\r",
+							"    results.push(...batchResults);\r",
+							"    console.log(`Batch ${(i / BATCH_SIZE) + 1} completed, batchCount=${batchResults.length}`);\r",
+							"  }\r",
+							"\r",
+							"  const totalTimeMs = Date.now() - startAll;\r",
+							"  const total = results.length;\r",
+							"  const successCount = results.filter(r => r.ok).length;\r",
+							"  const failCount = total - successCount;\r",
+							"  const avgMs = results.reduce((s, r) => s + (r.duration || 0), 0) / (total || 1);\r",
+							"  const minMs = results.length ? Math.min(...results.map(r => r.duration)) : 0;\r",
+							"  const maxMs = results.length ? Math.max(...results.map(r => r.duration)) : 0;\r",
+							"\r",
+							"  const statusCounts = results.reduce((acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; return acc; }, {});\r",
+							"\r",
+							"  const summary = {\r",
+							"    total, successCount, failCount,\r",
+							"    successRate: (successCount / total) || 0,\r",
+							"    avgMs, minMs, maxMs,\r",
+							"    totalTimeMs,\r",
+							"    statusCounts\r",
+							"  };\r",
+							"\r",
+							"  console.log('Parallel load finished. Summary:', summary);\r",
+							"  pm.environment.set('parallel_test_result', JSON.stringify(summary));\r",
+							"\r",
+							"  // помечаем тест в Postman UI как пройденный (чтобы видеть результат в тестах)\r",
+							"  pm.test('Parallel load completed', function () {\r",
+							"    pm.expect(summary.total).to.eql(TOTAL_REQUESTS);\r",
+							"  });\r",
+							"})();\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/history?startDate=2025-10-28T18:09:00&endDate=2025-10-28T18:10:00",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"history"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "2025-10-28T18:09:00"
+						},
+						{
+							"key": "endDate",
+							"value": "2025-10-28T18:10:00"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"// Формируем URL на основе environment\r",
+					"let protocol = pm.environment.get(\"protocol\");\r",
+					"let host = pm.environment.get(\"host\");\r",
+					"let port = pm.environment.get(\"port\");\r",
+					"\r",
+					"let baseUrl = `${protocol}://${host}:${port}/api/calculator`;\r",
+					"pm.environment.set(\"baseUrl\", baseUrl);\r",
+					"\r",
+					"// Лог для проверки\r",
+					"console.log(\"Base URL set to:\", baseUrl);"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

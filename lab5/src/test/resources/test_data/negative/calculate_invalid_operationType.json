@@ -1,0 +1,18 @@
+[
+  {
+    "firstNumber": "10",
+    "firstNumberSystem": "DECIMAL",
+    "secondNumber": "1",
+    "secondNumberSystem": "DECIMAL",
+    "operationType": "PLUS"
+  },
+  {
+    "firstNumber": "A",
+    "firstNumberSystem": "HEXADECIMAL",
+    "secondNumber": "1",
+    "secondNumberSystem": "HEXADECIMAL",
+    "operationType": "ADD_1"
+  }
+]
+
+
