@@ -15,6 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// Добавьте эти импорты в начало файла
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
 @Service
 @Transactional
 public class CalculatorService {
@@ -46,32 +51,33 @@ public class CalculatorService {
         return calculationRepository.save(calculation);
     }
 
-    /**
-     * Выполняет математическую операцию с числами в разных системах счисления
-     */
+    private static final int SCALE = 20; // точность для операций деления (кол-во знаков после запятой)
+    private static final int MAX_FRACTION_DIGITS = 30; // макс. цифр при конвертации дробной части в другие СС
+
     private String performCalculationWithDifferentSystems(CalculationRequest request) {
         try {
-            // Конвертируем оба числа в десятичную систему для вычислений
-            int num1 = convertToDecimal(request.getFirstNumber(), request.getFirstNumberSystem());
-            int num2 = convertToDecimal(request.getSecondNumber(), request.getSecondNumberSystem());
+            // Конвертируем оба числа в десятичную систему как BigDecimal
+            BigDecimal num1 = convertToDecimal(request.getFirstNumber(), request.getFirstNumberSystem());
+            BigDecimal num2 = convertToDecimal(request.getSecondNumber(), request.getSecondNumberSystem());
 
             // Выполняем операцию
-            int decimalResult;
+            BigDecimal decimalResult;
             switch (request.getOperationType()) {
                 case ADD:
-                    decimalResult = num1 + num2;
+                    decimalResult = num1.add(num2);
                     break;
                 case SUBTRACT:
-                    decimalResult = num1 - num2;
+                    decimalResult = num1.subtract(num2);
                     break;
                 case MULTIPLY:
-                    decimalResult = num1 * num2;
+                    decimalResult = num1.multiply(num2);
                     break;
                 case DIVIDE:
-                    if (num2 == 0) {
+                    if (num2.compareTo(BigDecimal.ZERO) == 0) {
                         throw new ArithmeticException("Division by zero");
                     }
-                    decimalResult = num1 / num2;
+                    // задаём точность деления
+                    decimalResult = num1.divide(num2, SCALE, RoundingMode.HALF_UP);
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown operation type: " + request.getOperationType());
@@ -86,19 +92,20 @@ public class CalculatorService {
     }
 
     /**
-     * Конвертирует число из любой системы счисления в десятичную
+     * Конвертирует число из любой системы счисления в десятичную (BigDecimal)
      */
-    private int convertToDecimal(String number, NumberSystem system) {
+    private BigDecimal convertToDecimal(String number, NumberSystem system) {
         try {
             switch (system) {
                 case BINARY:
-                    return Integer.parseInt(number, 2);
+                    return new BigDecimal(new BigInteger(number, 2));
                 case OCTAL:
-                    return Integer.parseInt(number, 8);
+                    return new BigDecimal(new BigInteger(number, 8));
                 case DECIMAL:
-                    return Integer.parseInt(number, 10);
+                    // допускаем целые и дробные десятичные строки
+                    return new BigDecimal(number);
                 case HEXADECIMAL:
-                    return Integer.parseInt(number, 16);
+                    return new BigDecimal(new BigInteger(number, 16));
                 default:
                     throw new IllegalArgumentException("Unsupported number system: " + system);
             }
@@ -108,21 +115,63 @@ public class CalculatorService {
     }
 
     /**
-     * Конвертирует число из десятичной системы в указанную систему счисления
+     * Конвертирует число из десятичной BigDecimal в указанную систему счисления.
+     * Поддерживает дробную часть (до MAX_FRACTION_DIGITS).
      */
-    private String convertFromDecimal(int number, NumberSystem system) {
+    private String convertFromDecimal(BigDecimal number, NumberSystem system) {
+        // Обрабатываем знак
+        boolean negative = number.signum() < 0;
+        BigDecimal absNumber = number.abs();
+
         switch (system) {
-            case BINARY:
-                return Integer.toBinaryString(number).toUpperCase();
-            case OCTAL:
-                return Integer.toOctalString(number).toUpperCase();
             case DECIMAL:
-                return Integer.toString(number).toUpperCase();
+                // Убираем лишние нули
+                String dec = absNumber.stripTrailingZeros().toPlainString();
+                return negative ? "-" + dec : dec;
+
+            case BINARY:
+                return (negative ? "-" : "") + convertToBase(absNumber, 2);
+            case OCTAL:
+                return (negative ? "-" : "") + convertToBase(absNumber, 8);
             case HEXADECIMAL:
-                return Integer.toHexString(number).toUpperCase();
+                return (negative ? "-" : "") + convertToBase(absNumber, 16).toUpperCase();
             default:
                 throw new IllegalArgumentException("Unsupported number system: " + system);
         }
+    }
+
+    /**
+     * Конвертирует положительное BigDecimal в позиционную систему с основанием radix (2,8,16 и т.д.)
+     * Возвращает строку вида "INT.FRACTION" (если есть дробная часть).
+     */
+    private String convertToBase(BigDecimal absNumber, int radix) {
+        BigInteger intPart = absNumber.toBigInteger(); // целая часть
+        BigDecimal fraction = absNumber.subtract(new BigDecimal(intPart)); // дробная часть
+
+        // преобразуем целую часть
+        String intStr = intPart.equals(BigInteger.ZERO) ? "0" : intPart.toString(radix);
+
+        if (fraction.compareTo(BigDecimal.ZERO) == 0) {
+            return intStr;
+        }
+
+        // преобразуем дробную часть: умножаем на radix и берём целую часть итеративно
+        StringBuilder fracBuilder = new StringBuilder();
+        BigDecimal current = fraction;
+        for (int i = 0; i < MAX_FRACTION_DIGITS && current.compareTo(BigDecimal.ZERO) != 0; i++) {
+            current = current.multiply(BigDecimal.valueOf(radix));
+            BigInteger digitBI = current.toBigInteger();
+            int digit = digitBI.intValue();
+            fracBuilder.append(digitToChar(digit));
+            current = current.subtract(new BigDecimal(digitBI));
+        }
+
+        return intStr + "." + fracBuilder.toString();
+    }
+
+    private char digitToChar(int digit) {
+        if (digit >= 0 && digit <= 9) return (char) ('0' + digit);
+        return (char) ('A' + (digit - 10)); // для hex и т.п.
     }
 
     /**
