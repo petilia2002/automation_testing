@@ -22,12 +22,12 @@ export class ResultColorDirective implements OnChanges {
 
   private applyColor() {
     if (this.value === null || this.value === undefined || this.value === '') {
-      this.renderer.setStyle(this.el.nativeElement, 'color', 'black');
+      this.renderer.removeStyle(this.el.nativeElement, 'color');
       return;
     }
     const num = Number(this.value);
     if (isNaN(num)) {
-      this.renderer.setStyle(this.el.nativeElement, 'color', 'black');
+      this.renderer.removeStyle(this.el.nativeElement, 'color');
       return;
     }
     if (num < 0) {
