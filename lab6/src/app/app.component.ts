@@ -9,5 +9,5 @@ import { CalculatorComponent } from './components/calculator/calculator.componen
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'calc-app';
+  title = 'Калькулятор';
 }

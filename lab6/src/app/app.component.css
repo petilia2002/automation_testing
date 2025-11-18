@@ -1,9 +1,10 @@
 :host {
-  display: block;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: #f7f8fa;
   color: #222;
   font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  height: 100vh;
 }
 
 /* header */
@@ -26,6 +27,7 @@
   display: flex;
   justify-content: center;
   padding: 28px 16px;
+  flex: 1;
 }
 
 /* заставляем внутренний калькулятор не растягиваться на всю ширину */
@@ -40,5 +42,5 @@ app-calculator {
   padding: 12px 8px;
   color: #666;
   font-size: 12px;
-  margin-top: 18px;
+  border: 1px solid #ccc;
 }

@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@CrossOrigin(
+        origins = "http://localhost:4200",
+        allowedHeaders = "*",
+        methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS }
+)
 @RestController
 @RequestMapping("/api/calculator")
 public class CalculatorController {

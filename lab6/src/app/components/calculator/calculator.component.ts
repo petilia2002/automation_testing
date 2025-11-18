@@ -29,18 +29,16 @@ import { PrecisionPipe } from '../../pipes/precision.pipe';
 export class CalculatorComponent implements OnInit {
   form: FormGroup;
 
-  // Экспорт enums в шаблон (на случай сравнения)
   OperationType = OperationType;
   NumberSystem = NumberSystem;
 
-  // Карты "enum -> читабельная метка (русская)"
+  // человекочитаемые метки (можно изменить)
   private readonly OPERATION_LABELS: Record<OperationType, string> = {
     [OperationType.ADD]: 'Сложить',
     [OperationType.SUBTRACT]: 'Вычесть',
     [OperationType.MULTIPLY]: 'Умножить',
     [OperationType.DIVIDE]: 'Разделить',
   };
-
   private readonly NUMBERSYSTEM_LABELS: Record<NumberSystem, string> = {
     [NumberSystem.BINARY]: 'Двоичная',
     [NumberSystem.OCTAL]: 'Восьмеричная',
@@ -48,36 +46,26 @@ export class CalculatorComponent implements OnInit {
     [NumberSystem.HEXADECIMAL]: 'Шестнадцатеричная',
   };
 
-  // Подготовленные опции с label
-  readonly operationOptions: Array<{
-    key: keyof typeof OperationType;
-    value: OperationType;
-    label: string;
-  }> = (Object.keys(OperationType) as Array<keyof typeof OperationType>).map(
-    (k) => {
-      const val = OperationType[k] as OperationType;
-      return {
-        key: k,
-        value: val,
-        label: this.OPERATION_LABELS[val] ?? String(val),
-      };
-    }
-  );
+  readonly operationOptions = (
+    Object.keys(OperationType) as Array<keyof typeof OperationType>
+  ).map((k) => {
+    const v = OperationType[k] as OperationType;
+    return { key: k, value: v, label: this.OPERATION_LABELS[v] ?? String(v) };
+  });
 
-  readonly numberSystemOptions: Array<{
-    key: keyof typeof NumberSystem;
-    value: NumberSystem;
-    label: string;
-  }> = (Object.keys(NumberSystem) as Array<keyof typeof NumberSystem>).map(
-    (k) => {
-      const val = NumberSystem[k] as NumberSystem;
-      return {
-        key: k,
-        value: val,
-        label: this.NUMBERSYSTEM_LABELS[val] ?? String(val),
-      };
-    }
-  );
+  readonly numberSystemOptions = (
+    Object.keys(NumberSystem) as Array<keyof typeof NumberSystem>
+  ).map((k) => {
+    const v = NumberSystem[k] as NumberSystem;
+    return {
+      key: k,
+      value: v,
+      label: this.NUMBERSYSTEM_LABELS[v] ?? String(v),
+    };
+  });
+
+  // флаг, который передаётся в дочерний компонент — запрещает ввод нуля во втором инпуте
+  isDivide = false;
 
   result: string | null = null;
   calculationId: number | null = null;
@@ -100,17 +88,27 @@ export class CalculatorComponent implements OnInit {
 
   ngOnInit(): void {
     this.form.get('operationType')!.valueChanges.subscribe((op) => {
-      if (op === OperationType.DIVIDE) {
+      this.isDivide = op === OperationType.DIVIDE;
+
+      if (this.isDivide) {
+        // применяем валидатор, запрещающий ноль
         this.form
           .get('secondNumber')!
           .setValidators([Validators.required, this.nonZeroValidator]);
+        // если текущее значение равно 0 — очищаем
+        const cur = this.form.get('secondNumber')!.value;
+        if (cur === '0' || cur === '-0') {
+          this.form.get('secondNumber')!.setValue('');
+        }
       } else {
+        // обычный валидатор
         this.form.get('secondNumber')!.setValidators([Validators.required]);
       }
       this.form.get('secondNumber')!.updateValueAndValidity();
     });
   }
 
+  // контроллерная валидация: если numeric === 0, возвращаем ошибку
   nonZeroValidator(control: any) {
     if (
       !control ||
@@ -120,6 +118,8 @@ export class CalculatorComponent implements OnInit {
     ) {
       return { required: true };
     }
+    // Преобразуем строку в число (предполагая десятичную систему на уровне валидации)
+    // Если нужно учитывать систему — можно прочитать соседний control и парсить с нужным base.
     const v = Number(control.value);
     if (!isNaN(v) && v === 0) {
       return { zeroNotAllowed: true };

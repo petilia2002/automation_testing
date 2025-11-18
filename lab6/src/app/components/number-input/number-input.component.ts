@@ -34,7 +34,9 @@ export class NumberInputComponent
 {
   @Input() label: string = '';
   @Input() numberSystem: NumberSystem = NumberSystem.DECIMAL;
-  @Input() disabled = false;
+
+  /** Если true — запрещаем ввод/вставку нулевого значения (0 or -0) */
+  @Input() forbidZero = false;
 
   value: string = '';
   onChange = (_: any) => {};
@@ -52,21 +54,68 @@ export class NumberInputComponent
     this.onTouched = fn;
   }
   setDisabledState?(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    // не используем disabled напрямую (управление через FormControl)
   }
+
+  // --- UI events handlers ---
 
   onInput(event: Event) {
     const input = event.target as HTMLInputElement;
-    this.value = input.value;
-    this.onChange(this.value);
+    const raw = input.value;
+    if (this.forbidZero) {
+      const numeric = this.parseToNumber(raw);
+      if (!isNaN(numeric) && numeric === 0) {
+        // очищаем поле и не регистрируем ноль
+        this.value = '';
+        input.value = '';
+        this.onChange(this.value);
+        return;
+      }
+    }
+
+    const pattern = this.getPatternForSystem(this.numberSystem);
+    if (raw === '' || pattern.test(raw)) {
+      this.value = raw;
+      this.onChange(this.value);
+    } else {
+      // недопустимый символ — откатываем видимое значение к последнему валидному
+      input.value = this.value;
+    }
   }
 
-  // Интерфейсный метод Validator - делегирует валидацию по значению внутреннего поля
+  onKeyDown(event: KeyboardEvent) {
+    if (!this.forbidZero) return;
+    const k = event.key;
+    if (k === '0' || k === 'Numpad0') {
+      const el = event.target as HTMLInputElement;
+      const cur = el.value;
+      if (cur === '' || cur === '-') {
+        event.preventDefault();
+      }
+    }
+  }
+
+  onPaste(event: ClipboardEvent) {
+    if (!this.forbidZero) return;
+    const text = event.clipboardData?.getData('text') ?? '';
+    const numeric = this.parseToNumber(text.trim());
+    if (!isNaN(numeric) && numeric === 0) {
+      event.preventDefault();
+    }
+  }
+
+  // --- Validator interface ---
+
   validate(control: AbstractControl<any, any>): ValidationErrors | null {
     return this.validateValue();
   }
 
-  // Вся логика валидации на основе this.value (не требует AbstractControl)
+  // публичный геттер для шаблона
+  public get validationErrors(): ValidationErrors | null {
+    return this.validateValue();
+  }
+
+  // приватная логика валидации (используется внутри класса)
   private validateValue(): ValidationErrors | null {
     if (this.value === null || this.value === '') {
       return { required: true };
@@ -75,8 +124,16 @@ export class NumberInputComponent
     if (!pattern.test(this.value)) {
       return { invalidNumberSystem: true };
     }
+    if (this.forbidZero) {
+      const num = this.parseToNumber(this.value);
+      if (!isNaN(num) && num === 0) {
+        return { zeroNotAllowed: true };
+      }
+    }
     return null;
   }
+
+  // --- Helpers ---
 
   private getPatternForSystem(sys: NumberSystem): RegExp {
     switch (sys) {
@@ -93,18 +150,29 @@ export class NumberInputComponent
     }
   }
 
-  // Геттеры для шаблона (используют индексную нотацию)
-  get validationErrors(): ValidationErrors | null {
-    return this.validateValue();
+  private baseForSystem(sys: NumberSystem): number {
+    switch (sys) {
+      case NumberSystem.BINARY:
+        return 2;
+      case NumberSystem.OCTAL:
+        return 8;
+      case NumberSystem.DECIMAL:
+        return 10;
+      case NumberSystem.HEXADECIMAL:
+        return 16;
+      default:
+        return 10;
+    }
   }
 
-  get hasInvalidNumberSystem(): boolean {
-    const e = this.validationErrors;
-    return !!(e && e['invalidNumberSystem']);
-  }
-
-  get hasRequiredError(): boolean {
-    const e = this.validationErrors;
-    return !!(e && e['required']);
+  private parseToNumber(val: string): number {
+    if (!val || val.trim() === '') return NaN;
+    const s = val.trim();
+    const negative = s.startsWith('-');
+    const core = negative ? s.slice(1) : s;
+    const base = this.baseForSystem(this.numberSystem);
+    const parsed = parseInt(core, base);
+    if (isNaN(parsed)) return NaN;
+    return negative ? -parsed : parsed;
   }
 }

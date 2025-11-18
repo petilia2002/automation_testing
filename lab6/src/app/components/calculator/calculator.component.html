@@ -1,5 +1,5 @@
 <div class="calculator">
-  <h2>Калькулятор</h2>
+  <!-- <h2>Калькулятор</h2> -->
 
   <form [formGroup]="form" (ngSubmit)="onCalculate()">
     <div class="row">
@@ -22,10 +22,7 @@
         formControlName="secondNumber"
         label="Второе число"
         [numberSystem]="form.value.secondNumberSystem"
-        [disabled]="
-          form.value.operationType === OperationType.DIVIDE &&
-          form.value.secondNumber === '0'
-        "
+        [forbidZero]="isDivide"
       ></app-number-input>
     </div>
 
