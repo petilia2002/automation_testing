@@ -1,7 +1,7 @@
 <div class="calculator">
   <!-- <h2>Калькулятор</h2> -->
 
-  <form [formGroup]="form" (ngSubmit)="onCalculate()">
+  <form [formGroup]="form" (ngSubmit)="onCalculate()" class="form">
     <div class="row">
       <app-number-input
         formControlName="firstNumber"
@@ -27,35 +27,49 @@
     </div>
 
     <div class="controls">
-      <label>Система первого числа</label>
-      <select formControlName="firstNumberSystem">
-        <option *ngFor="let s of numberSystemOptions" [value]="s.value">
-          {{ s.label }}
-        </option>
-      </select>
+      <div class="operation">
+        <label>Система первого числа</label>
+        <select formControlName="firstNumberSystem">
+          <option *ngFor="let s of numberSystemOptions" [value]="s.value">
+            {{ s.label }}
+          </option>
+        </select>
+      </div>
 
-      <label>Система второго числа</label>
-      <select formControlName="secondNumberSystem">
-        <option *ngFor="let s of numberSystemOptions" [value]="s.value">
-          {{ s.label }}
-        </option>
-      </select>
+      <div class="operation">
+        <label>Знаки после запятой</label>
+        <input
+          type="number"
+          formControlName="precision"
+          min="0"
+          max="20"
+          class="numberInput"
+        />
+      </div>
 
-      <label>Знаков после запятой (результат)</label>
-      <input type="number" formControlName="precision" min="0" max="20" />
+      <div class="operation">
+        <label>Система второго числа</label>
+        <select formControlName="secondNumberSystem">
+          <option *ngFor="let s of numberSystemOptions" [value]="s.value">
+            {{ s.label }}
+          </option>
+        </select>
+      </div>
     </div>
 
     <div class="actions">
-      <button type="submit" [disabled]="busy">Вычислить</button>
+      <button type="submit" [disabled]="busy" class="calcBtn">Вычислить</button>
     </div>
   </form>
 
   <div class="result-area" *ngIf="result !== null">
-    <label>Результат:</label>
-    <div [appResultColor]="result">
-      {{ result | precision : form.value.precision }}
+    <div class="result-group">
+      <label>Результат:</label>
+      <div [appResultColor]="result" class="result">
+        {{ result | precision : form.value.precision }}
+      </div>
+      <div class="meta">ID вычисления: {{ calculationId }}</div>
     </div>
-    <div class="meta">ID вычисления: {{ calculationId }}</div>
   </div>
 
   <div class="error" *ngIf="error">{{ error }}</div>

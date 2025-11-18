@@ -6,15 +6,17 @@
     (input)="onInput($event)"
     (keydown)="onKeyDown($event)"
     (paste)="onPaste($event)"
-    [attr.placeholder]="numberSystem + ' integer'"
+    [attr.placeholder]="'целое ' + numberSystem"
   />
-  <div class="error" *ngIf="validationErrors?.['invalidNumberSystem']">
-    Недопустимые символы для {{ numberSystem }}
-  </div>
-  <div class="error" *ngIf="validationErrors?.['required']">
-    Поле обязательно
-  </div>
-  <div class="error" *ngIf="validationErrors?.['zeroNotAllowed']">
-    Нулевое значение недопустимо
+  <div class="error-container">
+    <div class="error" *ngIf="validationErrors?.['invalidNumberSystem']">
+      Недопустимые символы для {{ numberSystem }}
+    </div>
+    <div class="error" *ngIf="validationErrors?.['required']">
+      Поле обязательное
+    </div>
+    <div class="error" *ngIf="validationErrors?.['zeroNotAllowed']">
+      Нулевое значение недопустимо
+    </div>
   </div>
 </div>

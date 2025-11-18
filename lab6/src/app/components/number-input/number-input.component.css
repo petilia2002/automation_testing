@@ -5,17 +5,34 @@
 }
 
 .number-input label {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.number-input input {
-  padding: 6px;
+  font-weight: 500;
+  margin-bottom: 5px;
   font-size: 14px;
 }
 
+.number-input input {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 2px solid #79b0f8;
+  border-radius: 5px;
+}
+
+.number-input input:focus {
+  outline: none;
+  border-color: #397ee2;
+  box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
+}
+
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 16px;
+  padding-top: 4px;
+}
+
 .error {
-  color: #a00;
+  color: red;
   font-size: 12px;
-  margin-top: 4px;
+  font-weight: 500;
 }

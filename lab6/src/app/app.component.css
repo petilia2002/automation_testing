@@ -25,7 +25,7 @@
 .app-main {
   display: flex;
   justify-content: center;
-  padding: 28px 16px;
+  align-items: center;
   flex: 1;
 }
 
