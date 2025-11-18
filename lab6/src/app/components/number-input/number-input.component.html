@@ -1,1 +1,14 @@
-<p>number-input works!</p>
+<div class="number-input">
+  <label>{{ label }}</label>
+  <input
+    type="text"
+    [value]="value"
+    (input)="onInput($event)"
+    [disabled]="disabled"
+    [attr.placeholder]="numberSystem + ' integer'"
+  />
+  <div class="error" *ngIf="hasInvalidNumberSystem">
+    Недопустимые символы для {{ numberSystem }}
+  </div>
+  <div class="error" *ngIf="hasRequiredError">Поле обязательно</div>
+</div>

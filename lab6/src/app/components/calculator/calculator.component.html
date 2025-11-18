@@ -1,1 +1,65 @@
-<p>calculator works!</p>
+<div class="calculator">
+  <h2>Калькулятор</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onCalculate()">
+    <div class="row">
+      <app-number-input
+        formControlName="firstNumber"
+        label="Первое число"
+        [numberSystem]="form.value.firstNumberSystem"
+      ></app-number-input>
+
+      <div class="operation">
+        <label>Операция</label>
+        <select formControlName="operationType">
+          <option *ngFor="let op of operationOptions" [value]="op.value">
+            {{ op.label }}
+          </option>
+        </select>
+      </div>
+
+      <app-number-input
+        formControlName="secondNumber"
+        label="Второе число"
+        [numberSystem]="form.value.secondNumberSystem"
+        [disabled]="
+          form.value.operationType === OperationType.DIVIDE &&
+          form.value.secondNumber === '0'
+        "
+      ></app-number-input>
+    </div>
+
+    <div class="controls">
+      <label>Система первого числа</label>
+      <select formControlName="firstNumberSystem">
+        <option *ngFor="let s of numberSystemOptions" [value]="s.value">
+          {{ s.label }}
+        </option>
+      </select>
+
+      <label>Система второго числа</label>
+      <select formControlName="secondNumberSystem">
+        <option *ngFor="let s of numberSystemOptions" [value]="s.value">
+          {{ s.label }}
+        </option>
+      </select>
+
+      <label>Знаков после запятой (результат)</label>
+      <input type="number" formControlName="precision" min="0" max="20" />
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="busy">Вычислить</button>
+    </div>
+  </form>
+
+  <div class="result-area" *ngIf="result !== null">
+    <label>Результат:</label>
+    <div [appResultColor]="result">
+      {{ result | precision : form.value.precision }}
+    </div>
+    <div class="meta">ID вычисления: {{ calculationId }}</div>
+  </div>
+
+  <div class="error" *ngIf="error">{{ error }}</div>
+</div>

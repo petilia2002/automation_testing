@@ -1,0 +1,21 @@
+.number-input {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+
+.number-input label {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.number-input input {
+  padding: 6px;
+  font-size: 14px;
+}
+
+.error {
+  color: #a00;
+  font-size: 12px;
+  margin-top: 4px;
+}
