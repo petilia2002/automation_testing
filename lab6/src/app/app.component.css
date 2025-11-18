@@ -1,15 +1,14 @@
 :host {
   display: flex;
   flex-direction: column;
-  background: #f7f8fa;
+  background: #fff;
   color: #222;
-  font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
   height: 100vh;
 }
 
 /* header */
 .app-header {
-  background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+  background: linear-gradient(90deg, #79b0f8 0%, #3370d0 100%);
   color: white;
   padding: 18px 24px;
   text-align: center;
@@ -39,8 +38,8 @@ app-calculator {
 /* footer */
 .app-footer {
   text-align: center;
-  padding: 12px 8px;
+  padding: 15px 8px;
   color: #666;
-  font-size: 12px;
+  font-size: 15px;
   border: 1px solid #ccc;
 }

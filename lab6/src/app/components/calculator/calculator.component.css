@@ -1,20 +1,41 @@
 .calculator {
   max-width: 800px;
+  /* height: 200px; */
   margin: 20px auto;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
+  box-shadow: rgba(63, 140, 244, 0.2) 0px 8px 24px;
 }
 
 .row {
   display: flex;
   gap: 16px;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .operation {
   display: flex;
   flex-direction: column;
+  width: 200px;
+}
+
+select {
+  padding: 12px;
+  border: 2px solid #79b0f8;
+  border-radius: 8px;
+  background: #fafbfc;
+  transition: all 0.3s ease;
+  color: #3f8cf4;
+  width: 100%;
+  box-shadow: none;
+}
+
+select:focus {
+  outline: none;
+  border-color: #3f8cf4;
+  background: white;
+  box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 3px;
 }
 
 .controls {
