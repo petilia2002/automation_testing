@@ -1,0 +1,46 @@
+[
+  {
+    "testName": "Binary addition",
+    "request": {
+      "firstNumber": "1010",
+      "firstNumberSystem": "BINARY",
+      "secondNumber": "110",
+      "secondNumberSystem": "BINARY",
+      "operationType": "ADD"
+    },
+    "expectedResult": "10000"
+  },
+  {
+    "testName": "Octal subtraction",
+    "request": {
+      "firstNumber": "17",
+      "firstNumberSystem": "OCTAL",
+      "secondNumber": "5",
+      "secondNumberSystem": "OCTAL",
+      "operationType": "SUBTRACT"
+    },
+    "expectedResult": "12"
+  },
+  {
+    "testName": "Hexadecimal multiplication",
+    "request": {
+      "firstNumber": "A",
+      "firstNumberSystem": "HEXADECIMAL",
+      "secondNumber": "5",
+      "secondNumberSystem": "HEXADECIMAL",
+      "operationType": "MULTIPLY"
+    },
+    "expectedResult": "32"
+  },
+  {
+    "testName": "Decimal division",
+    "request": {
+      "firstNumber": "15",
+      "firstNumberSystem": "DECIMAL",
+      "secondNumber": "3",
+      "secondNumberSystem": "DECIMAL",
+      "operationType": "DIVIDE"
+    },
+    "expectedResult": "5"
+  }
+]
