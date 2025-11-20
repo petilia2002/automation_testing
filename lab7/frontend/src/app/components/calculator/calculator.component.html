@@ -1,0 +1,74 @@
+<div class="calculator">
+  <form [formGroup]="form" (ngSubmit)="onCalculate()" class="form">
+    <div class="row">
+      <app-number-input
+        formControlName="firstNumber"
+        label="Первое число"
+        [numberSystem]="form.value.firstNumberSystem"
+      ></app-number-input>
+
+      <div class="operation">
+        <label>Операция</label>
+        <select formControlName="operationType">
+          <option *ngFor="let op of operationOptions" [value]="op.value">
+            {{ op.label }}
+          </option>
+        </select>
+      </div>
+
+      <app-number-input
+        formControlName="secondNumber"
+        label="Второе число"
+        [numberSystem]="form.value.secondNumberSystem"
+        [forbidZero]="isDivide"
+      ></app-number-input>
+    </div>
+
+    <div class="controls">
+      <div class="operation">
+        <label>Система первого числа</label>
+        <select formControlName="firstNumberSystem">
+          <option *ngFor="let s of numberSystemOptions" [value]="s.value">
+            {{ s.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="operation">
+        <label>Знаки после запятой</label>
+        <input
+          type="number"
+          formControlName="precision"
+          min="0"
+          max="20"
+          class="numberInput"
+        />
+      </div>
+
+      <div class="operation">
+        <label>Система второго числа</label>
+        <select formControlName="secondNumberSystem">
+          <option *ngFor="let s of numberSystemOptions" [value]="s.value">
+            {{ s.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="busy" class="calcBtn">Вычислить</button>
+    </div>
+  </form>
+
+  <div class="result-area" *ngIf="result !== null">
+    <div class="result-group">
+      <label>Результат:</label>
+      <div [appResultColor]="result" class="result">
+        {{ result | precision : form.value.precision }}
+      </div>
+      <div class="meta">ID вычисления: {{ calculationId }}</div>
+    </div>
+  </div>
+
+  <div class="error" *ngIf="error">{{ error }}</div>
+</div>

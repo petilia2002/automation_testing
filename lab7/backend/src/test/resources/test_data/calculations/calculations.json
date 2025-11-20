@@ -1,0 +1,29 @@
+[
+  {
+    "firstNumber": "1010",
+    "firstNumberSystem": "BINARY",
+    "secondNumber": "110",
+    "secondNumberSystem": "BINARY",
+    "operationType": "ADD",
+    "result": "10000",
+    "calculationDate": "2024-01-03T20:00:00"
+  },
+  {
+    "firstNumber": "17",
+    "firstNumberSystem": "OCTAL",
+    "secondNumber": "5",
+    "secondNumberSystem": "OCTAL",
+    "operationType": "SUBTRACT",
+    "result": "12",
+    "calculationDate": "2024-01-03T19:00:00"
+  },
+  {
+    "firstNumber": "A",
+    "firstNumberSystem": "HEXADECIMAL",
+    "secondNumber": "5",
+    "secondNumberSystem": "HEXADECIMAL",
+    "operationType": "MULTIPLY",
+    "result": "32",
+    "calculationDate": "2024-01-03T18:00:00"
+  }
+]

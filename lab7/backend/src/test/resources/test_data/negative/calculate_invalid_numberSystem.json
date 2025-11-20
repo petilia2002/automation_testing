@@ -1,0 +1,18 @@
+[
+  {
+    "firstNumber": "10",
+    "firstNumberSystem": "BIN",
+    "secondNumber": "1",
+    "secondNumberSystem": "DECIMAL",
+    "operationType": "ADD"
+  },
+  {
+    "firstNumber": "10",
+    "firstNumberSystem": "DECIMAL",
+    "secondNumber": "1",
+    "secondNumberSystem": "DEC",
+    "operationType": "ADD"
+  }
+]
+
+
