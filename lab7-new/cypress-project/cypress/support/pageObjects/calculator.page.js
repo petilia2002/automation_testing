@@ -1,4 +1,3 @@
-// calculator.page.js
 class CalculatorPage {
   visit() {
     cy.visit("/"); // baseUrl берётся из cypress.config.js
